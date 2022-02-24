@@ -1,26 +1,28 @@
 ﻿using RegisterAndLoginForms.Models;
 using System.Data.SqlClient;
+using MySql.Data.MySqlClient;
 
 namespace RegisterAndLoginForms.Services
 {
     public class UsersDAO
     {
-        string connectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=Test;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+        string connectionString = @"server=localhost;user=root;database=customerdb;port=3306;password=root";
            
         public bool FindUserByNameAndPassword(UserModel user)
         {
             bool success = false;
-            string sqlStatement = "SELECT * FROM dbo.Users WHERE username=@username AND password=@password";
+            string sqlStatement = "SELECT * FROM Users WHERE username=@username AND password=@password";
 
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
-                SqlCommand command = new SqlCommand(sqlStatement, connection);
-                command.Parameters.Add("username", System.Data.SqlDbType.VarChar, 40).Value = user.UserName;
-                command.Parameters.Add("password", System.Data.SqlDbType.VarChar, 40).Value= user.Password;
+                MySqlCommand command = new MySqlCommand(sqlStatement, connection);
+                command.Parameters.AddWithValue("@username", user.UserName);
+                command.Parameters.AddWithValue("@password", user.Password);
                 try
                 {
                     connection.Open();
-                    SqlDataReader reader =command.ExecuteReader();
+                    MySqlDataReader reader =command.ExecuteReader();
                     if (reader.HasRows)
                         success= true;
                 }
